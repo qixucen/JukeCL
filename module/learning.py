@@ -1,3 +1,4 @@
+from typing import Any
 import torch
 import torch.nn as nn
 from pytorch_lightning import LightningModule
@@ -14,7 +15,7 @@ class ContrastiveLearning(LightningModule):
         self.n_features = (
             self.encoder.fc.in_features
         )  # get dimensions of last fully-connected layer
-        self.model = SimCLR(
+        self.model = SimCLR(  # in SimCLR, the encofer.fc will be replaced with nn.Indentity()
             self.encoder, self.hparams.projection_dim, self.n_features)
         # self.model = Dino(self.encoder, self.hparams.projection_dim, self.n_features)
         self.criterion = self.configure_criterion()
@@ -68,3 +69,9 @@ class ContrastiveLearning(LightningModule):
             return {"optimizer": optimizer, "lr_scheduler": scheduler}
         else:
             return {"optimizer": optimizer}
+        
+
+class ClusterLearning(LightningModule):
+    def __init__(self, args) -> None:
+        super().__init__()
+        self.save_hyperparameters(args)

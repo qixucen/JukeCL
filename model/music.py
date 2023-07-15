@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class MCBBolck(nn.Module):
+class MCBBlock(nn.Module):
 
     def __init__(self, input_shape, output_shape) -> None:
         super().__init__()
@@ -34,19 +34,56 @@ class MCB(nn.Module):
 
     def __init__(self, dims) -> None:
         super().__init__()
-        self.MCBBlocks = [
-            MCBBolck(dims[i], dims[i + 1]) for i in range(len(dims) - 1)
-        ]
+        self.MCBBlocks = nn.ModuleList(
+            [MCBBlock(dims[i], dims[i + 1]) for i in range(len(dims) - 1)])
 
     def forward(self, input):
         output = input
-        for MCBBlock in self.MCBBlocks:
-            output = MCBBlock(output)
-        return output
+        for Block in self.MCBBlocks:
+            output = Block(output)
+        return output.flatten(-2)
 
 
-dims = [(1, 96, 800), (64, 48, 400), (128, 16, 200), (128, 4, 50)]
-m = MCB(dims)
-input = torch.randn(12, 1, 96, 800)
-output = m(input)
-print(output.shape)
+class GRU(nn.Module):
+
+    def __init__(self, dims) -> None:
+        super().__init__()
+        self.GRUBlocks = nn.ModuleList([
+            nn.GRU(input_size=dims[i][0],
+                   hidden_size=dims[i + 1][0],
+                   num_layers=2,
+                   batch_first=True) for i in range(len(dims) - 1)
+        ])
+
+    def forward(self, input):
+        output = input.permute(0, 2, 1).unsqueeze(0)
+        for Block in self.GRUBlocks:
+            output = Block(output[0])
+            print(output[0].shape)
+        return output[0].permute(0, 2, 1)
+
+
+if __name__ == '__main__':
+    dims = [(1, 96, 800), (64, 48, 400), (128, 16, 200), (128, 4, 50)]
+    m = MCB(dims)
+    input = torch.randn(12, 1, 96, 800)
+    output = m(input)
+    # print(m.parameters)
+    # print(output.shape)
+    # g = nn.GRU(input_size=128,
+    #            hidden_size=256,
+    #            num_layers=2,
+    #            batch_first=True,)
+    # input = torch.randn(12, 128, 25).permute(0, 2, 1)
+    # print(g(input)[0].shape)
+    dims = [(128, 25), (256, 25), (128, 25)]
+    g = GRU(dims)
+    input = torch.randn(12, 128, 25)
+    print(g(input).shape)
+    # print(g.parameters)
+
+    # rnn = nn.GRU(25, 25, 12)
+    # input = torch.randn(12, 128, 25)
+    # h0 = torch.randn(12, 128, 25)
+    # output, hn = rnn(input, h0)
+    # print(hn.shape)
