@@ -1,3 +1,4 @@
+import os
 import argparse
 import torch
 import torch.nn as nn
@@ -8,18 +9,19 @@ from dataset import get_dataset, ClusteringDataset
 from torch.utils.data import DataLoader
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
-# from torchaudio_augmentations import (
-#     RandomApply,
-#     ComposeMany,
-#     RandomResizedCrop,
-#     PolarityInversion,
-#     Noise,
-#     Gain,
-#     HighLowPass,
-#     Delay,
-#     PitchShift,
-#     Reverb,
-# )
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+'''from torchaudio_augmentations import (
+    RandomApply,
+    ComposeMany,
+    RandomResizedCrop,
+    PolarityInversion,
+    Noise,
+    Gain,
+    HighLowPass,
+    Delay,
+    PitchShift,
+    Reverb,
+)'''
 
 
 class MusicAutoEncoder(nn.Module):
@@ -98,8 +100,8 @@ if __name__ == '__main__':
     #                 p=args.transforms_reverb),
     # ]
 
-    train_dataset = get_dataset(args.dataset_dir, args.dataset)
-    train_dataset = ClusteringDataset(dataset=train_dataset)
+    dataset = get_dataset(args.dataset_dir, args.dataset)
+    dataset = ClusteringDataset(dataset=dataset)
     # train_dataset = ContrastiveDataset(
     #     train_dataset,
     #     input_shape=(1, args.audio_length),
@@ -109,13 +111,17 @@ if __name__ == '__main__':
     # )
 
     train_loader = DataLoader(
-        train_dataset,
+        dataset,
         batch_size=args.batch_size,
-        num_workers=args.workers,
+        num_workers=16,
         persistent_workers=True,
         drop_last=True,
         shuffle=True,
     )
+    
+    print("!")
+    for d in train_loader:
+        print(d[0].shape)
 
     module = ClusteringLearning(args, autoencoder)
     logger = TensorBoardLogger("runs", name="CLMRv2-{}".format(args.dataset))
@@ -132,6 +138,6 @@ if __name__ == '__main__':
             # gpus=[0],
             devices=1,
         )
-        trainer.fit(module, train_dataloaders=train_loader, val_dataloaders=train_loader)
+        trainer.fit(module, train_dataloaders=train_loader)
 
     # print(autoencoder.parameters)
