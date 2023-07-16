@@ -132,6 +132,6 @@ if __name__ == '__main__':
             # gpus=[0],
             devices=1,
         )
-        trainer.fit(module, train_loader)
+        trainer.fit(module, train_dataloaders=train_loader, val_dataloaders=train_loader)
 
     # print(autoencoder.parameters)
