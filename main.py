@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 [Reverb(sample_rate=args.sample_rate)], p=args.transforms_reverb
             ),]
     
-    train_dataset = get_dataset(args.dataset, args.dataset_dir, subset="train", download=False)
+    train_dataset = get_dataset(args.dataset, args.dataset_dir, subset="train")
 
     contrastive_train_dataset = ContrastiveDataset(
         train_dataset,
@@ -94,20 +94,18 @@ if __name__ == '__main__':
     module = ContrastiveLearning(args, encoder)
     logger = TensorBoardLogger("runs", name="CLMRv2-{}".format(args.dataset))
     if args.checkpoint_path:
-        module = module.load_from_checkpoint(
-            args.checkpoint_path, encoder=encoder, output_dim=train_dataset.n_classes
-        )
+        pass
     else:
         trainer = Trainer(
             logger=logger,
             sync_batchnorm=True,
             max_epochs=args.max_epochs,
-            log_every_n_steps=50,
+            log_every_n_steps=20,
             check_val_every_n_epoch=1,
             accelerator=args.accelerator,
             gpus=[0],
         )
-        trainer.fit(module, train_loader, valid_loader)
+        trainer.fit(module, train_loader)
     
     print(encoder.parameters)
     print(encoder.fc.in_features)

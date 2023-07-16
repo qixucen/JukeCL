@@ -3,7 +3,7 @@ import torch
 # from torchaudio_augmentations import Compose
 from typing import Tuple, List
 from torch.utils.data import Dataset
-from log_mel import log_mel
+from dataset.log_mel import log_mel, load_wav
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 from torch.utils.data import DataLoader
@@ -43,7 +43,7 @@ class GTZAN(Dataset):
                     if wav_path[-3:] != 'wav':
                         break
                     self.dataset.append(
-                        (torch.Tensor(log_mel(wav_path)), torch.Tensor([i])))
+                        (torch.Tensor(load_wav(wav_path)), torch.Tensor([i])))
 
     def __getitem__(self, idx):
         audio = self.dataset[idx][0]
@@ -76,16 +76,17 @@ class ContrastiveDataset(Dataset):
 
         audio, label = self.dataset[idx]
 
-        if audio.shape[1] < self.input_shape[1]:
+        if audio.shape[1] != self.input_shape[1]:
             self.ignore_idx.append(idx)
             return self[idx + 1]
 
         if self.transform:
             audio = self.transform(audio)
-        return audio, label
+        return log_mel(audio), label
 
     def __len__(self) -> int:
         return len(self.dataset)
+
 
 if __name__ == '__main__':
     dataset = GTZAN(r'data\GZTAN')

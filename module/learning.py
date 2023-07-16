@@ -70,8 +70,3 @@ class ContrastiveLearning(LightningModule):
         else:
             return {"optimizer": optimizer}
         
-
-class ClusterLearning(LightningModule):
-    def __init__(self, args) -> None:
-        super().__init__()
-        self.save_hyperparameters(args)
