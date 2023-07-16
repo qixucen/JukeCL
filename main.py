@@ -5,7 +5,7 @@ import torch.nn as nn
 from model.music import MCB, GRU, DEMCB
 from module.learning import ClusteringLearning
 from module.utils import yaml_config_hook
-from dataset import get_dataset, ClusteringDataset
+from dataprepare import get_dataset
 from torch.utils.data import DataLoader
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -101,7 +101,10 @@ if __name__ == '__main__':
     # ]
 
     dataset = get_dataset(args.dataset_dir, args.dataset)
-    dataset = ClusteringDataset(dataset=dataset)
+    for d in dataset:
+        print(d[0].shape)
+        break
+    # dataset = ClusteringDataset(dataset=dataset)
     # train_dataset = ContrastiveDataset(
     #     train_dataset,
     #     input_shape=(1, args.audio_length),
