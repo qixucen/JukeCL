@@ -1,7 +1,8 @@
 gpus: 1
 accelerator: "cuda" # use ddp for gpus > 1. Also see PyTorch Lightning documentation on distributed training.
 workers: 16 # I recommend tuning this parameter for faster data augmentation processing
-dataset_dir: "./data"
+dataset_dir: "D:\\Assignment\\dance\\Unsupervised-Rhythm-Clustering-Embedding\\data\\GZTAN"
+dataset: "GTZAN"
 
 # train options
 seed: 42
@@ -12,6 +13,7 @@ max_epochs: 200
 projection_dim: 64 # Projection dim. of SimCLR projector
 
 # loss options
+k: 0.5
 optimizer: "Adam" # or LARS (experimental)
 learning_rate: 3.0e-4
 weight_decay: 1.0e-6 # "optimized using LARS [...] and weight decay of 10−6"
@@ -20,12 +22,10 @@ temperature: 0.5 # see appendix B.7.: Optimal temperature under different batch 
 # reload options
 checkpoint_path: "" 
 
-# logistic regression options
-finetuner_mlp: 0
-finetuner_checkpoint_path: ""
-finetuner_max_epochs: 200
-finetuner_batch_size: 256
-finetuner_learning_rate: 0.001
+# learning options
+num_clusters: 10
+hidden_size: 32
+alpha: 0.1
 
 # audio data augmentation options
 audio_length: 127840

@@ -57,7 +57,7 @@ class GTZAN(Dataset):
 def get_dataset(dataset_dir, dataset='GTZAN', subset='train'):
     assert os.path.exists(dataset_dir)
     if dataset == 'GTZAN':
-        d = GTZAN(root=dataset_dir, subset=subset)
+        d = GTZAN(root=dataset_dir)
     return d
 
 
@@ -88,21 +88,39 @@ class ContrastiveDataset(Dataset):
         return len(self.dataset)
 
 
-if __name__ == '__main__':
-    dataset = GTZAN(r'data\GZTAN')
-    for d in dataset:
-        print(d[0].shape, d[1].shape)
-        print(d[0].requires_grad)
-        break
-    dataloader = DataLoader(
-        dataset,
-        batch_size=64,
-        num_workers=16,
-        persistent_workers=True,
-        drop_last=True,
-        shuffle=True,
-    )
-    for batch in dataloader:
-        print(batch[0].requires_grad)
-        print(batch[0].shape, batch[1].shape)
-        break
+class ClusteringDataset(Dataset):
+
+    def __init__(self, dataset: Dataset, transform: Compose = None):
+        self.dataset = dataset
+        self.transform = transform
+        self.ignore_idx = []
+
+    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
+        audio, label = self.dataset[idx]
+
+        if self.transform:
+            audio = self.transform(audio)
+        return log_mel(audio), label
+
+    def __len__(self) -> int:
+        return len(self.dataset)
+
+
+# if __name__ == '__main__':
+#     dataset = GTZAN(r'data\GZTAN')
+#     for d in dataset:
+#         print(d[0].shape, d[1].shape)
+#         print(d[0].requires_grad)
+#         break
+#     dataloader = DataLoader(
+#         dataset,
+#         batch_size=64,
+#         num_workers=16,
+#         persistent_workers=True,
+#         drop_last=True,
+#         shuffle=True,
+#     )
+#     for batch in dataloader:
+#         print(batch[0].requires_grad)
+#         print(batch[0].shape, batch[1].shape)
+#         break

@@ -44,6 +44,47 @@ class MCB(nn.Module):
         return output.flatten(-2)
 
 
+class DEMCBBlock(nn.Module):
+
+    def __init__(self, input_shape, output_shape):
+        super().__init__()
+        # input_shape f.e.:(1,96,800)
+        # output_shape  f.e.:(64,48,400)
+
+        self.upsample = nn.Upsample(size=output_shape[1:],
+                                    mode='bilinear',
+                                    align_corners=True)
+        self.convlayer = nn.Conv2d(input_shape[0],
+                                   output_shape[0],
+                                   kernel_size=3,
+                                   stride=1,
+                                   padding=1)
+        self.normlayer = nn.BatchNorm2d(output_shape[0])
+        self.activation = nn.ELU()
+
+    def forward(self, input):
+        assert len(input.shape) == 4, '4D input expected.'
+        output = self.upsample(input)
+        output = self.convlayer(output)
+        output = self.normlayer(output)
+        output = self.activation(output)
+        return output
+
+
+class DEMCB(nn.Module):
+
+    def __init__(self, dims) -> None:
+        super().__init__()
+        self.DEMCBBlocks = nn.ModuleList(
+            [DEMCBBlock(dims[i], dims[i + 1]) for i in range(len(dims) - 1)])
+
+    def forward(self, input):
+        output = input
+        for Block in self.DEMCBBlocks:
+            output = Block(output)
+        return output
+
+
 class GRU(nn.Module):
 
     def __init__(self, dims) -> None:
@@ -59,31 +100,31 @@ class GRU(nn.Module):
         output = input.permute(0, 2, 1).unsqueeze(0)
         for Block in self.GRUBlocks:
             output = Block(output[0])
-            print(output[0].shape)
         return output[0].permute(0, 2, 1)
 
 
-if __name__ == '__main__':
-    dims = [(1, 96, 800), (64, 48, 400), (128, 16, 200), (128, 4, 50)]
-    m = MCB(dims)
-    input = torch.randn(12, 1, 96, 800)
-    output = m(input)
-    # print(m.parameters)
-    # print(output.shape)
-    # g = nn.GRU(input_size=128,
-    #            hidden_size=256,
-    #            num_layers=2,
-    #            batch_first=True,)
-    # input = torch.randn(12, 128, 25).permute(0, 2, 1)
-    # print(g(input)[0].shape)
-    dims = [(128, 25), (256, 25), (128, 25)]
-    g = GRU(dims)
-    input = torch.randn(12, 128, 25)
-    print(g(input).shape)
-    # print(g.parameters)
+# if __name__ == '__main__':
+#     dims = [(1, 96, 800), (64, 48, 400), (128, 16, 200), (128, 4, 50)]
+#     m = DEMCB(dims[::-1])
+#     input = torch.randn(12, 128, 4, 50)
+#     output = m(input)
+#     print(output.shape)
+#     # print(m.parameters)
+#     # print(output.shape)
+#     # g = nn.GRU(input_size=128,
+#     #            hidden_size=256,
+#     #            num_layers=2,
+#     #            batch_first=True,)
+#     # input = torch.randn(12, 128, 25).permute(0, 2, 1)
+#     # print(g(input)[0].shape)
+#     dims = [(128, 25), (256, 25), (128, 25)]
+#     g = GRU(dims)
+#     input = torch.randn(12, 128, 25)
+#     print(g(input).shape)
+#     # print(g.parameters)
 
-    # rnn = nn.GRU(25, 25, 12)
-    # input = torch.randn(12, 128, 25)
-    # h0 = torch.randn(12, 128, 25)
-    # output, hn = rnn(input, h0)
-    # print(hn.shape)
+# #     # rnn = nn.GRU(25, 25, 12)
+# #     # input = torch.randn(12, 128, 25)
+# #     # h0 = torch.randn(12, 128, 25)
+# #     # output, hn = rnn(input, h0)
+# #     # print(hn.shape)
