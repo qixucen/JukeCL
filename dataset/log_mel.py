@@ -8,5 +8,5 @@ def log_mel(music_path):
     log_S = np.log(S + 1e-8)[np.newaxis, :]
     return log_S
 
-path = r'D:\Assignment\dance\Unsupervised-Rhythm-Clustering-Embedding\data\GZTAN\blues\blues.00000.wav'
-print(log_mel(path).shape)
+# path = r'D:\Assignment\dance\Unsupervised-Rhythm-Clustering-Embedding\data\GZTAN\blues\blues.00000.wav'
+# print(log_mel(path).shape)
