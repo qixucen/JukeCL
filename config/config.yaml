@@ -5,8 +5,8 @@ dataset_dir: "D:\\Assignment\\dance\\Unsupervised-Rhythm-Clustering-Embedding\\d
 dataset: "GTZAN"
 
 # train options
-seed: 42
-batch_size: 128
+seed: 24
+batch_size: 64
 max_epochs: 200
 
 # SimCLR model options

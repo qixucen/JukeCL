@@ -102,7 +102,7 @@ class ClusteringLayer(nn.Module):
         return t_dist
 
 
-class ClusteringLearning(LightningModule):
+class ClusteringLearning(nn.Module):
 
     def __init__(self, args, autoencoder: nn.Module) -> None:
         super().__init__()
@@ -119,6 +119,7 @@ class ClusteringLearning(LightningModule):
                                                self.hidden_size,
                                                self.cluster_centers,
                                                self.alpha)
+        self.optimizer = self.configure_optimizers()
 
     def target_distribution(self, q_):
         weight = (q_**2) / torch.sum(q_, 0)
@@ -129,17 +130,20 @@ class ClusteringLearning(LightningModule):
         return hidden, recon
 
     def training_step(self, input):
-        print('!', end='')
         hidden, recon = self(input)
         dec = self.clusteringlayer(hidden)
         target = self.target_distribution(dec).detach()
         loss = self.args.alpha * self.reconLoss(
             input, recon) + (1 - self.args.alpha) * self.Kldivgence(
                 dec.log(), target) / dec.shape[0]
-        return loss
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        return loss.item()
 
     def configure_optimizers(self) -> dict:
         optimizer = torch.optim.Adam(list(self.autoencoder.parameters()) +
                                      list(self.clusteringlayer.parameters()),
                                      lr=self.args.learning_rate)
-        return {"optimizer": optimizer}
+        # return {"optimizer": optimizer}
+        return optimizer
