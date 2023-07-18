@@ -16,13 +16,13 @@
 
 Unsupervised-Rhythm-Clustering-Embedding的本质，是在上游模型提取特征的基础上，再进行聚类的训练。
 
-对于上游特征提取，可以有contrastive learning或者autoencoder这两种比较经典的无监督特征提取方法。
+对于上游特征提取，有contrastive learning或者autoencoder这两种比较经典的无监督特征提取方法。
 
-对于下游聚类训练，可见原论文中参考的[DEC](https://arxiv.org/pdf/1511.06335v2.pdf)，本质上是通过计算t分布来衡量嵌入点和聚类中心的相似度，再将这个t分布相似度和目标相似度计算kl散度作为损失函数。
+对于下游聚类训练，可见原论文中参考的[DEC](https://arxiv.org/pdf/1511.06335v2.pdf)，通过计算t分布来衡量嵌入点和聚类中心的相似度`q`，再将这个`q`和目标相似度计算kl散度作为损失函数。
 
 #### contrastive learning
 
-调用官方simclr实现，传入一个`encoder`即可，对于`encoder`的限制很宽松，只需要尾接一个命名为self.fc的层即可，在官方的simclr实现中会将这个层替换为self.
+调用官方simclr实现，传入一个`encoder`即可，对于`encoder`的限制很宽松，只需要尾接一个命名为self.fc的nn.linear层即可，在官方的simclr实现中会将这个层替换为nn.Identity，为了便于下游任务，self.fc的in_features和预先设定的`feature_dim`保持一致
 
 #### clustering learning
 
@@ -32,4 +32,28 @@ Unsupervised-Rhythm-Clustering-Embedding的本质，是在上游模型提取特�
 
 #### Trainning data
 
-数据可以在[此处]()下载，解压到data文件夹下即可
+数据可以在[google drive](https://drive.google.com/file/d/1lyy-enxsv6CJiSAcUB2BaWC2FxFO9Mf_/view?usp=sharing)下载，解压到data文件夹下即可
+
+### repo 文件说明
+`train.py`:
+```bash
+python train.py --task contrastive --max_epochs 100
+```
+在`runs`文件夹下得到上游任务的checkpoint
+
+```bash
+python train.py --task clustering --max_epochs 20 --upstream_checkpoint_path your_contrastive_checkpoint_path
+```
+在`runs`文件夹下得到下游任务的checkpoint
+
+`plotit.py`:
+```bash
+python plotit.py  --upstream_checkpoint_path your_contrastive_checkpoint_path
+```
+在`png`文件夹下得到`show.png`可视化特征的聚类效果
+
+`model/music.py`:
+对音乐数据（shape=[B,1,96,800]）的encoder函数
+
+`module/learning.py`:
+上下游任务的训练函数
