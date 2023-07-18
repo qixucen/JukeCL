@@ -24,12 +24,6 @@ for k, v in config.items():
     parser.add_argument(f"--{k}", default=v, type=type(v))
 args = parser.parse_args()
 
-
-# module = ContrastiveLearning(args, autoencoder).to(device)
-# checkpoint_path = '/home/ubuntu/AI/clmr/Unsupervised-Rhythm-Clustering-Embedding/runs/CLMRv2-GTZAN-contrastive/version_0/checkpoints/epoch=35-step=3564.ckpt'
-# module = module.load_from_checkpoint(
-#     checkpoint_path=checkpoint_path, encoder=autoencoder, args=args)
-
 encoder = MusicEncoder(MCBdims=MCBdims,
                                GRUdims=GRUdims,
                                feature_dim=32)

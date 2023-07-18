@@ -29,7 +29,7 @@ device = torch.device('cuda:1')
 # os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
-class MusicAutoEncoder(nn.Module):
+'''class MusicAutoEncoder(nn.Module):
 
     def __init__(self, MCBdims, GRUdims, feature_dim=32) -> None:
         super().__init__()
@@ -63,7 +63,7 @@ class MusicAutoEncoder(nn.Module):
     def forward(self, input):
         hidden = self.encoder(input)
         recon = self.decoder(hidden)
-        return hidden, recon
+        return hidden, recon'''
 
 
 class MusicEncoder(nn.Module):
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     logger = TensorBoardLogger(
         "runs", name="CLMRv2-{}-{}".format(args.dataset, args.task))
 
-    if args.upstream_checkpoint_path and args.task == 'clustering':
+    if args.upstream_checkpoint_path and args.task == 'clustering':  # 进行特征聚类训练
 
         module = module.load_from_checkpoint(
             checkpoint_path=args.upstream_checkpoint_path, encoder=encoder, args=args)
@@ -178,7 +178,7 @@ if __name__ == '__main__':
             devices=1,
         )
         trainer.fit(module, data_loader)
-    elif args.task == 'contrastive':
+    elif args.task == 'contrastive':  # 进行对比学习特征提取
         trainer = Trainer(
             logger=logger,
             sync_batchnorm=True,
