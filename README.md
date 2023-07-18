@@ -18,7 +18,7 @@ Unsupervised-Rhythm-Clustering-Embedding的本质，是在上游模型提取特�
 
 对于上游特征提取，有contrastive learning或者autoencoder这两种比较经典的无监督特征提取方法
 
-对于下游聚类训练，可见原论文中参考的[DEC](https://arxiv.org/pdf/1511.06335v2.pdf)，通过计算t分布来衡量嵌入点和聚类中心的相似度`q`，再将这个`q`和目标相似度计算kl散度作为损失函数。
+对于下游聚类训练，可见原论文中参考的[DEC](https://arxiv.org/pdf/1511.06335v2.pdf)，通过t分布来衡量嵌入点和聚类中心的相似度`q_ij` = $\frac{(1-||z_i-\mu_j||^2)^{-\frac{\alpha + 1}{2}}}{\sum_j^{'}(1-||z_i-\mu_j^{'}||^2)^{-\frac{\alpha + 1}{2}}}$，再将`q`和目标相似度`target`=$\frac{q^{2}_{ij}/f_{j}}{\sum_{j^{'}}q^{2}_{ij^{'}}/f_{j}}$计算kl散度作为损失函数（$f_j = \sum_i q_{ij}$）。
 
 #### contrastive learning
 
