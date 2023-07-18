@@ -1,0 +1,10 @@
+- ![#6A539D](https://via.placeholder.com/15/6A539D/000000?text=+) `#6A539D`
+- ![#FFFF00](https://via.placeholder.com/15/FFFF00/000000?text=+) `#FFFF00`
+- ![#99CCCC](https://via.placeholder.com/15/99CCCC/000000?text=+) `#99CCCC`
+- ![#FFCCCC](https://via.placeholder.com/15/FFCCCC/000000?text=+) `#FFCCCC`
+- ![#00FFFF](https://via.placeholder.com/15/00FFFF/000000?text=+) `#00FFFF`
+- ![#7D6C46](https://via.placeholder.com/15/7D6C46/000000?text=+) `#7D6C46`
+- ![#FF99CC](https://via.placeholder.com/15/FF99CC/000000?text=+) `#FF99CC`
+- ![#336699](https://via.placeholder.com/15/336699/000000?text=+) `#336699`
+- ![#FFCC99](https://via.placeholder.com/15/FFCC99/000000?text=+) `#FFCC99`
+- ![#993366](https://via.placeholder.com/15/993366/000000?text=+) `#993366`
